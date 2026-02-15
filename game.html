@@ -1,0 +1,220 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to top, #a8edea, #fed6e3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .game {
+      width: 600px;
+      height: 250px;
+      background: #fff;
+      border: 3px solid #333;
+      position: relative;
+      overflow: hidden;
+    }
+
+
+    #player {
+      width: 50px;
+      height: 50px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/2922/2922506.png'); /* Replace with your face */
+      background-size: cover;
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+    }
+
+    #hurdle {
+      width: 40px;
+      height: 40px;
+      background-color: #ff5252;
+      position: absolute;
+      bottom: 0;
+      left: 600px;
+      animation: moveHurdle 2s linear infinite;
+    }
+
+    #hurdle_upper {
+      width: 40px;
+      height: 80px;
+      background-color: #ff5252;
+      position: absolute;
+      top: 0;
+      left: 600px;
+      animation: moveHurdle 2s linear infinite;
+    }
+
+    #scoreboard{
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-family: 'Poppins', sans-serif;
+      color: black;
+    }
+    
+
+    @keyframes moveHurdle {
+      0% { left: 600px; }
+      100% { left: -40px; }
+    }
+
+    .jump {
+      animation: jump 0.6s ease-out;
+    }
+
+    .move_left {
+      transform: translateX(-5px)
+    }
+
+    .move_right {
+      transform: translateX(5px)
+    }
+
+    @keyframes jump {
+      0% { bottom: 0; }
+      50% { bottom: 100px; }
+      100% { bottom: 0; }
+    }
+
+
+
+
+
+    </style>
+    
+</head>
+<body>
+    <div class="game">
+    <div id="player"></div>
+    <div id="hurdle"></div>
+    <div id="hurdle_upper"></div>
+    <div id="scoreboard">Score: 0</div>
+  </div>
+
+  <script>
+    const player = document.getElementById("player");
+    const hurdle = document.getElementById("hurdle");
+    const hurdle_upper = document.getElementById("hurdle_upper");
+    const scoreboard = document.getElementById("scoreboard");
+
+    let playerPosition = 50;
+    let leftBound = 0;
+    let rightBound = 600;
+    let stepSize = 5;
+    let score = 0;
+    let health = 2;
+    let gameOver = false;
+    let collision = false;
+
+    function jump() {
+      if (!player.classList.contains("jump")) {
+        player.classList.add("jump");
+        setTimeout(() => {
+          player.classList.remove("jump");
+        }, 600);
+      }
+    }
+
+    function move_left(){
+      if (playerPosition > (leftBound + 5)){
+        playerPosition -= stepSize;
+        player.style.left = playerPosition + "px";
+        
+      }
+    }
+
+    function move_right(){
+      if (playerPosition < (rightBound - 5)){
+        playerPosition += stepSize;
+        player.style.left = playerPosition + "px";
+        
+      }
+    }
+
+    function updateScore(){
+      scoreboard.textContent = `Score: ${score}`;
+    }
+
+
+      let isAlive = setInterval(() => {
+
+        if(gameOver){
+          clearInterval(isAlive);
+          return;
+        }
+
+        const playerBottom = parseInt(window.getComputedStyle(player).getPropertyValue("bottom"));    //Returns an object containing all CSS properties of player.
+        const playerTop = parseInt(window.getComputedStyle(player).getPropertyValue("top"));    
+        const hurdleLeft = parseInt(window.getComputedStyle(hurdle).getPropertyValue("left"));
+
+        // Detect collision — when hurdle is close to player and player is too low
+        if ((Math.abs(playerPosition - hurdleLeft) < 45) && playerBottom < 40 && hurdleLeft > 0) {
+
+          health -= 1;
+          collision = true;
+
+          if (health > 0){
+            if(health === 1){
+              setTimeout(() =>{
+                alert("💥");
+              }, 0)
+              
+            }
+          } 
+          
+          if (health <= 0) {
+
+            alert("💥 Game Over! Press OK to play again.");
+            gameOver = true;
+            clearInterval(isAlive);
+            return;
+          }
+
+        }
+
+      }, 10);
+
+
+
+      document.addEventListener("keydown", e => {
+        if (e.code === "Space" || e.code === "ArrowUp")  jump();
+      });
+
+      document.addEventListener("keydown", e => {
+        if (e.code === "ArrowLeft") {
+          move_left();
+        }
+      });
+
+      document.addEventListener("keydown", e => {
+        if (e.code === "ArrowRight") {
+          move_right();
+        }
+      }); 
+
+      hurdle.addEventListener("animationiteration", () =>{
+
+        if(!collision && health > 0){
+          score +=1;
+          updateScore();
+        }
+
+        collision = false;
+
+      })
+  </script>
+</body>
+</html>
