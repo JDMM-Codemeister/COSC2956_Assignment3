@@ -166,11 +166,17 @@
           health -= 1;
           collision = true;
 
+          hurdle.style.animationPlayState = "paused";
+          hurdle_upper.style.animationPlayState = "paused";
+
+
+
           if (health > 0){
             if(health === 1){
-              setTimeout(() =>{
-                alert("💥");
-              }, 0)
+
+              alert("💥");
+              hurdle.style.animationPlayState = "running";
+              hurdle_upper.style.animationPlayState = "running";
               
             }
           } 
@@ -185,7 +191,7 @@
 
         }
 
-      }, 10);
+      }, 0);
 
 
 
